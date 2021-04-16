@@ -8,7 +8,7 @@ ip rule del fwmark "$NETFILTER_MARK" lookup "$IPROUTE2_TABLE_ID" > /dev/null 2> 
 ip rule add fwmark "$NETFILTER_MARK" lookup "$IPROUTE2_TABLE_ID"
 
 nft -f - << EOF
-define LOCAL_SUBNET = {127.0.0.0/8, 224.0.0.0/4, 192.168.0.0/16, 10.0.0.0/8, 172.16.0.0/12}
+define LOCAL_SUBNET = {127.0.0.0/8, 224.0.0.0/4, 192.168.0.0/16, 10.0.0.0/8, 172.16.0.0/12, 240.0.0.0/4, 169.254.0.0/16, 0.0.0.0/8}
 
 table clash
 flush table clash
@@ -60,6 +60,10 @@ table clash {
 }
 EOF
 
-sysctl -w net/ipv4/ip_forward=1
+# in /etc/sysctl.conf, modify following value to 1:
+# net.ipv4.ip_forward, net.ipv6.conf.all.forwarding
+# or, uncomment the following lines
+# sysctl -w net/ipv4/ip_forward=1
+# sysctl -w net/ipv6/conf/all/forwarding=1
 
 exit 0

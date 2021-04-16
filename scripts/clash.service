@@ -4,8 +4,14 @@ After=network-online.target nftables.service iptabels.service
 
 [Service]
 Type=simple
+StandardError=journal
+User=pi
+Group=pi
+# CapabilityBoundingSet=CAP_NET_BIND_SERVICE CAP_NET_ADMIN
+# AmbientCapabilities=CAP_NET_BIND_SERVICE CAP_NET_ADMIN
 ExecStartPre=+/usr/lib/clash/setup-cgroup.sh
-ExecStart=/usr/bin/bypass-proxy /usr/bin/clash -d /srv/clash
+ExecStart=/usr/bin/sudo /usr/bin/bypass-proxy /home/pi/bin/clash -f /home/pi/.config/clash/config.yaml
+Restart=on-failure
 
 [Install]
 WantedBy=multi-user.target

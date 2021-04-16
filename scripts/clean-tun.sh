@@ -10,4 +10,10 @@ flush table clash
 delete table clash
 EOF
 
+# in /etc/sysctl.conf, modify following value to 0:
+# net.ipv4.ip_forward, net.ipv6.conf.all.forwarding
+# or, uncomment the following lines
+# sysctl -w net/ipv4/ip_forward=0
+# sysctl -w net/ipv6/conf/all/forwarding=0
+
 exit 0

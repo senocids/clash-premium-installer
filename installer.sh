@@ -23,7 +23,7 @@ function _install() {
     assert_command nft
     assert_command ip
 
-    if [ ! -d "/usr/lib/udev/rules.d" ];then
+    if [ ! -d "/lib/udev/rules.d" ];then
     echo "udev not found"
     exit 1
     fi
@@ -45,11 +45,15 @@ function _install() {
     
     assert install -d -m 0755 /etc/default/
     assert install -d -m 0755 /usr/lib/clash/
-    assert install -d -m 0644 /srv/clash/
 
-    assert install -m 0755 ./clash /usr/bin/clash
-    
     assert install -m 0644 scripts/clash-default /etc/default/clash
+    . /etc/default/clash
+
+    assert install -d -m 0755 $HOMEPATH/.config/clash/
+    assert install -m 0755 ./clash $HOMEPATH/bin/clash
+    assert install -m 0600 ./config.yaml $HOMEPATH/.config/clash/config.yaml
+    
+
 
     assert install -m 0755 scripts/bypass-proxy-pid /usr/bin/bypass-proxy-pid
     assert install -m 0755 scripts/bypass-proxy /usr/bin/bypass-proxy
@@ -59,17 +63,19 @@ function _install() {
     assert install -m 0700 scripts/setup-cgroup.sh /usr/lib/clash/setup-cgroup.sh
 
     assert install -m 0644 scripts/clash.service /usr/lib/systemd/system/clash.service
-    assert install -m 0644 scripts/99-clash.rules /usr/lib/udev/rules.d/99-clash.rules
+    assert install -m 0644 scripts/99-clash.rules /lib/udev/rules.d/99-clash.rules
+    
+    systemctl daemon-reload
 
     echo "Install successfully"
     echo ""
-    echo "Home directory at /srv/clash"
+    echo "Home directory at $HOMEPATH/.config/clash"
     echo ""
-    echo "All dns traffic will be redirected to 1.0.0.1:53"
-    echo "Please use clash core's 'tun.dns-hijack' to handle it"
+    echo "All dns traffic will be redirected to $FORWARD_DNS_REDIRECT"
+    echo "*PLEASE* use clash core's 'tun.dns-hijack' to handle it"
     echo ""
-    echo "Use 'systemctl start clash' to start"
-    echo "Use 'systemctl enable clash' to enable auto-restart on boot"
+    echo "Use '$ sudo systemctl start clash' to start"
+    echo "Use '$ sudo systemctl enable clash' to enable auto-restart on boot"
 
     exit 0
 }
@@ -81,11 +87,12 @@ function _uninstall() {
     systemctl stop clash
     systemctl disable clash
 
-    rm -rf /usr/lib/clash
+    rm -rf /usr/lib/clash/
+    rm -rf $HOMEPATH/.config/clash/config.yaml
     rm -rf /usr/lib/systemd/system/clash.service
-    rm -rf /usr/lib/udev/rules.d/99-clash.rules
-    rm -rf /usr/bin/clash
-    rm -rf /usr/bin/bypass-proxy-uid
+    rm -rf /lib/udev/rules.d/99-clash.rules
+    rm -rf $HOMEPATH/bin/clash
+    rm -rf /usr/bin/bypass-proxy-pid
     rm -rf /usr/bin/bypass-proxy
     rm -rf /etc/default/clash
 
