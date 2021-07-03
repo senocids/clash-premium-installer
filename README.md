@@ -3,6 +3,8 @@
 Simple clash premiun core installer with full tun support for Linux.
 
 ### Note for this fork
+
+This fork will not be maintained any more.
 Please notice that for a fresh raspbian, 
 uncomment the following lines in file: `scripts/setup-tun.sh`.
 ```sh
